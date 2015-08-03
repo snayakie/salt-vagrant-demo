@@ -12,6 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     master_config.vm.synced_folder "saltstack/salt/", "/srv/salt"
 
     master_config.vm.provision :salt do |salt|
+      salt.bootstrap_options = "-P"
       salt.master_config = "saltstack/etc/master"
       salt.master_key = "saltstack/keys/master_minion.pem"
       salt.master_pub = "saltstack/keys/master_minion.pub"
@@ -25,6 +26,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       salt.no_minion = true
       salt.verbose = true
     end
+
+    master_config.vm.provision "shell",
+      inline: "sudo cp /vagrant/saltstack/etc/master /etc/salt/master && sudo service salt-master restart"
   end
 
   config.vm.define :minion1 do |minion_config|
@@ -33,12 +37,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     minion_config.vm.network "private_network", ip: "192.168.50.11"
 
     minion_config.vm.provision :salt do |salt|
-      salt.minion_config = "saltstack/etc/minion1"
+      salt.bootstrap_options = "-P"
+      #salt.minion_config = "saltstack/etc/minion1"
       salt.minion_key = "saltstack/keys/minion1.pem"
       salt.minion_pub = "saltstack/keys/minion1.pub"
       salt.install_type = "stable"
       salt.verbose = true
     end
+    minion_config.vm.provision "shell",
+      inline: "sudo cp /vagrant/saltstack/etc/minion1 /etc/salt/minion && sudo service salt-minion restart"
   end
 
   config.vm.define :minion2 do |minion_config|
@@ -51,12 +58,15 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     minion_config.vm.network "private_network", ip: "192.168.50.12"
 
     minion_config.vm.provision :salt do |salt|
-      salt.minion_config = "saltstack/etc/minion2"
+      salt.bootstrap_options = "-P"
+      #salt.minion_config = "saltstack/etc/minion2"
       salt.minion_key = "saltstack/keys/minion2.pem"
       salt.minion_pub = "saltstack/keys/minion2.pub"
       salt.install_type = "stable"
       salt.verbose = true
     end
+    minion_config.vm.provision "shell",
+      inline: "sudo cp /vagrant/saltstack/etc/minion2 /etc/salt/minion && sudo service salt-minion restart"
   end
 
 end
